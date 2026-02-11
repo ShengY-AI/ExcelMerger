@@ -12,13 +12,17 @@ from openpyxl import Workbook
 # =========================
 
 def app_dir() -> str:
-    """返回程序基准目录：开发阶段为 .py 所在目录；打包后为 .app 所在目录（macOS）或 exe 所在目录（Windows）。"""
+    """返回运行基准目录：
+    - 开发态：.py 所在目录
+    - 打包态 Windows：exe 所在目录
+    - 打包态 macOS：.app 的父目录（即与 InputFolder/OutputFolder 同级的发布目录）
+    """
     if getattr(sys, "frozen", False):
         exe_path = sys.executable.replace("\\", "/")
         marker = ".app/Contents/MacOS"
         if marker in exe_path:
-            # /.../ExcelMerger.app/Contents/MacOS/ExcelMerger  ->  /.../ExcelMerger.app
-            return exe_path.split(marker)[0] + ".app"
+            app_path = exe_path.split(marker)[0] + ".app"
+            return os.path.dirname(app_path)  # ✅ 关键：返回 .app 的父目录
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
 
