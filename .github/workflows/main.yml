@@ -1,0 +1,57 @@
+name: Build ExcelMerger
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller openpyxl
+
+      - name: Build exe
+        run: |
+          pyinstaller --onefile --name ExcelMerger excel_merger_app.py
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ExcelMerger-Windows
+          path: dist/ExcelMerger.exe
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller openpyxl
+
+      - name: Build app
+        run: |
+          pyinstaller --windowed --name ExcelMerger excel_merger_app.py
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ExcelMerger-macOS
+          path: dist/ExcelMerger.app
